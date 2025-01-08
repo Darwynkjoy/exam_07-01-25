@@ -13,40 +13,27 @@ class _formpageState extends State<Formpage>{
   TextEditingController yearcontroller=TextEditingController();
   TextEditingController ratingcontroller=TextEditingController();
 
+  List<Map<String,dynamic>> bookItems=[];
   late Box box;
-  List<Map<String,dynamic>> books=[];
 
-    openbox()async{
+  openbox()async{
     box=await Hive.openBox("books");
     loadBooks();
   }
 
-   void loadBooks()async{
-    List<Map<String,dynamic>>? bookItems=box.get("books")?.cast<String>();
-    if(bookItems !=null){
-      setState(() {
-       books=bookItems; 
-      });
-    }
+  void initState(){
+    super.initState();
+    openbox();
   }
 
-  void saveBooks()async{
-    await box.put("Books", books);
-  }
-
-  void addbookItems(String books){
-    if(books.isNotEmpty){
-      setState(() {
-        books.add(books);
-      });
+    void loadBooks(){
+    List<Map<String,String>>? book=box.get("books")?.cast<String>();
+    print("books loaded:$book");
+    setState(() {
+      bookItems=book!;
+    });
     }
-    saveBooks();
-    titlecontroller.clear();
-    authorcontroller.clear();
-    generecontroller.clear();
-    yearcontroller.clear();
-    ratingcontroller.clear();
-  }
+
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -116,8 +103,21 @@ class _formpageState extends State<Formpage>{
                 ),
                 onPressed: (){
                   setState(() {
-                    saveBooks();
+                    bookItems.add({
+                      "title":titlecontroller.text,
+                      "author":authorcontroller.text,
+                      "genere":generecontroller.text,
+                      "year":yearcontroller.text,
+                      "rating":yearcontroller.text,
+                    });
+                    box.put("books", bookItems);
+                    titlecontroller.clear();
+                    authorcontroller.clear();
+                    generecontroller.clear();
+                    yearcontroller.clear();
+                    ratingcontroller.clear();
                   });
+                  Navigator.pop(context);
                 }, child: Text("Add book",style: TextStyle(fontSize: 20,color: Colors.white),)),
             )
           ],

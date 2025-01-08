@@ -1,11 +1,33 @@
 import 'package:exam_books/book_form.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class Homepage extends StatefulWidget{
   @override
   State<Homepage> createState()=> _homepageState();
 }
 class _homepageState extends State<Homepage>{
+  late Box box;
+  List<Map<String,dynamic>> bookItems=[];
+
+  openbox()async{
+    box=await Hive.openBox("books");
+    loadBooks();
+  }
+
+  void initState(){
+    super.initState();
+    openbox();
+  }
+
+  void loadBooks(){
+    List<Map<String,String>>? book=box.get("books")?.cast<String>();
+    print("books loaded:$book");
+    setState(() {
+      bookItems=book!;
+    });
+    }
+
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -57,7 +79,7 @@ class _homepageState extends State<Homepage>{
         );
       },
       separatorBuilder: (context,index){return SizedBox(height: 20,);},
-      itemCount: 2),
+      itemCount: bookItems.length),
 
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
