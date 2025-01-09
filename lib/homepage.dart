@@ -11,7 +11,7 @@ class _homepageState extends State<Homepage>{
   List<Map<String,dynamic>> bookItems=[];
 
   openbox()async{
-    box=await Hive.openBox("books");
+    box=await Hive.openBox("boxbooks");
     loadBooks();
   }
 
@@ -20,12 +20,19 @@ class _homepageState extends State<Homepage>{
     openbox();
   }
 
-  void loadBooks(){
-    List<Map<String,String>>? book=box.get("books")?.cast<String>();
-    print("books loaded:$book");
-    setState(() {
-      bookItems=book!;
-    });
+    void loadBooks(){
+    List <dynamic> book=box.get("books")?.cast<dynamic>();
+    if(book != null){
+      setState(() {
+        bookItems=List<Map<String,dynamic>>.from(book);
+      });
+    }
+    else{
+      setState(() {
+        bookItems=[];
+      });
+    }
+    print("books loaded:$bookItems");
     }
 
   @override
@@ -79,7 +86,7 @@ class _homepageState extends State<Homepage>{
         );
       },
       separatorBuilder: (context,index){return SizedBox(height: 20,);},
-      itemCount: 2),
+      itemCount: bookItems.length),
 
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,

@@ -17,7 +17,7 @@ class _formpageState extends State<Formpage>{
   late Box box;
 
   openbox()async{
-    box=await Hive.openBox("books");
+    box=await Hive.openBox("boxbooks");
     loadBooks();
   }
 
@@ -27,12 +27,20 @@ class _formpageState extends State<Formpage>{
   }
 
     void loadBooks(){
-    List<Map<String,String>>? book=box.get("books")?.cast<String>();
-    print("books loaded:$book");
-    setState(() {
-      bookItems=book!;
-    });
+    List <dynamic> book=box.get("books")?.cast<dynamic>();
+    if(book != null){
+      setState(() {
+        bookItems=List<Map<String,dynamic>>.from(book);
+      });
     }
+    else{
+      setState(() {
+        bookItems=[];
+      });
+    }
+    print("books loaded:$bookItems");
+    }
+
 
   @override
   Widget build(BuildContext context){
@@ -103,7 +111,7 @@ class _formpageState extends State<Formpage>{
                 ),
                 onPressed: (){
                   setState(() {
-                    bookItems.add({
+                    bookItems!.add({
                       "title":titlecontroller.text,
                       "author":authorcontroller.text,
                       "genere":generecontroller.text,
@@ -116,6 +124,8 @@ class _formpageState extends State<Formpage>{
                     generecontroller.clear();
                     yearcontroller.clear();
                     ratingcontroller.clear();
+                    print("this is box values:${box.values}");
+                    print("book items:${bookItems}");
                   });
                   Navigator.pop(context);
                 }, child: Text("Add book",style: TextStyle(fontSize: 20,color: Colors.white),)),
